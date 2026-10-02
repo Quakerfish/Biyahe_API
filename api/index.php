@@ -2,23 +2,36 @@
 // api/index.php
 
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-$filePath = __DIR__ . '/..' . $uri;
 
-// 1. If requesting a specific .php file directly (e.g. /admin_login.php)
-if (str_ends_with($uri, '.php')) {
-    if (file_exists($filePath)) {
-        require $filePath;
+// Clean up URI
+$path = ltrim($uri, '/');
+
+// Target file location
+$filePath = __DIR__ . '/../' . $path;
+
+// 1. If hitting a .php endpoint (like admin_login.php)
+if (str_ends_with($uri, '.php') || file_exists($filePath . '.php')) {
+    $target = str_ends_with($uri, '.php') ? $filePath : $filePath . '.php';
+    if (file_exists($target)) {
+        require $target;
         exit;
     }
 }
 
-// 2. Serve static assets (CSS, JS, Images) if requested through the router
+// 2. Serve static assets (CSS, JS, Images, Favicon)
 if ($uri !== '/' && file_exists($filePath) && !is_dir($filePath)) {
-    $mime = mime_content_type($filePath);
-    if (str_ends_with($filePath, '.css')) $mime = 'text/css';
-    if (str_ends_with($filePath, '.js')) $mime = 'application/javascript';
+    $ext = pathinfo($filePath, PATHINFO_EXTENSION);
+    $mimes = [
+        'css'  => 'text/css',
+        'js'   => 'application/javascript',
+        'ico'  => 'image/x-icon',
+        'png'  => 'image/png',
+        'jpg'  => 'image/jpeg',
+        'svg'  => 'image/svg+xml'
+    ];
     
-    header("Content-Type: $mime");
+    $contentType = $mimes[$ext] ?? mime_content_type($filePath);
+    header("Content-Type: $contentType");
     readfile($filePath);
     exit;
 }
