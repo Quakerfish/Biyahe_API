@@ -1,26 +1,31 @@
 <?php
 // api/index.php
 
-// Get the requested URL path
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$filePath = __DIR__ . '/..' . $uri;
 
-// Normalize path
-$file = __DIR__ . '/..' . $uri;
-
-// If targeting a specific root file (e.g., /admin_login.php), require it directly
-if ($uri !== '/' && file_exists($file) && !is_dir($file)) {
-    require $file;
+// If it's a real file (CSS, JS, images), serve it directly
+if ($uri !== '/' && file_exists($filePath) && !is_dir($filePath)) {
+    $mime = mime_content_type($filePath);
+    if (str_ends_with($filePath, '.css')) $mime = 'text/css';
+    if (str_ends_with($filePath, '.js')) $mime = 'application/javascript';
+    
+    header("Content-Type: $mime");
+    readfile($filePath);
     exit;
 }
 
-// Default response or fall back to dashboard/index
-if ($uri === '/' || $uri === '') {
-    if (file_exists(__DIR__ . '/../dashboard.php')) {
-        require __DIR__ . '/../dashboard.php';
-        exit;
-    }
+// Route PHP requests
+if (file_exists($filePath) && str_ends_with($filePath, '.php')) {
+    require $filePath;
+    exit;
 }
 
-// 404 handler
+// Fallback / default route
+if ($uri === '/' || $uri === '') {
+    require __DIR__ . '/../admin/index.html'; // adjust to your actual login/index page
+    exit;
+}
+
 http_response_code(404);
 echo json_encode(["error" => "Endpoint not found: " . $uri]);
