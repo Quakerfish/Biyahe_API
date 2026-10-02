@@ -2,23 +2,18 @@
 // api/index.php
 
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-
-// Clean up URI
 $path = ltrim($uri, '/');
-
-// Target file location
 $filePath = __DIR__ . '/../' . $path;
 
-// 1. If hitting a .php endpoint (like admin_login.php)
-if (str_ends_with($uri, '.php') || file_exists($filePath . '.php')) {
-    $target = str_ends_with($uri, '.php') ? $filePath : $filePath . '.php';
-    if (file_exists($target)) {
-        require $target;
+// 1. If hitting a .php endpoint (e.g. /admin_signup.php or /admin_login.php)
+if (str_ends_with($uri, '.php')) {
+    if (file_exists($filePath)) {
+        require $filePath;
         exit;
     }
 }
 
-// 2. Serve static assets (CSS, JS, Images, Favicon)
+// 2. Serve static assets (CSS, JS, Images)
 if ($uri !== '/' && file_exists($filePath) && !is_dir($filePath)) {
     $ext = pathinfo($filePath, PATHINFO_EXTENSION);
     $mimes = [
@@ -36,7 +31,7 @@ if ($uri !== '/' && file_exists($filePath) && !is_dir($filePath)) {
     exit;
 }
 
-// 3. Fallback for root / or missing routes
+// 3. Fallback for root route
 if ($uri === '/' || $uri === '') {
     if (file_exists(__DIR__ . '/../admin/index.html')) {
         require __DIR__ . '/../admin/index.html';
