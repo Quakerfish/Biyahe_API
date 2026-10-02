@@ -65,14 +65,14 @@
           <p class="stat-note" id="stat-active-routes-note">Metro Cebu corridors</p>
         </div>
         <div class="stat-card fade-in delay-2">
-          <p class="stat-label">Active PUJs</p>
-          <p class="stat-value" id="stat-active-pujs">N/A</p>
-          <p class="stat-note">No vehicle telemetry table yet</p>
+          <p class="stat-label">Terminals</p>
+          <p class="stat-value" id="stat-terminals">0</p>
+          <p class="stat-note" id="stat-terminals-note">Transit hubs registered</p>
         </div>
         <div class="stat-card fade-in delay-3">
-          <p class="stat-label">Fleet Health</p>
-          <p class="stat-value" id="stat-fleet-health">N/A</p>
-          <p class="stat-note">No vehicle health data yet</p>
+          <p class="stat-label">Waypoints</p>
+          <p class="stat-value" id="stat-waypoints">0</p>
+          <p class="stat-note" id="stat-waypoints-note">Mapped corridor points</p>
         </div>
         <div class="stat-card fade-in delay-4">
           <p class="stat-label">Total Users</p>
@@ -280,6 +280,12 @@ async function fetchDashboardRoutes() {
 function renderStats(stats) {
   document.getElementById('stat-active-routes').textContent = stats.active_routes.toLocaleString();
   document.getElementById('stat-active-routes-note').textContent = `of ${stats.total_routes} total routes`;
+
+  document.getElementById('stat-terminals').textContent = stats.total_terminals.toLocaleString();
+  document.getElementById('stat-terminals-note').textContent = `${stats.total_landmarks} registered landmarks`;
+
+  document.getElementById('stat-waypoints').textContent = stats.total_waypoints.toLocaleString();
+  document.getElementById('stat-waypoints-note').textContent = `Across active transit corridors`;
 
   document.getElementById('stat-total-users').textContent = stats.total_people.toLocaleString();
   document.getElementById('stat-total-users-note').textContent =

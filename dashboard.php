@@ -21,6 +21,7 @@ try {
     $totalAdmins    = (int) $conn->query('SELECT COUNT(*) FROM admins')->fetchColumn();
     $totalTerminals = (int) $conn->query('SELECT COUNT(*) FROM terminals')->fetchColumn();
     $totalLandmarks = (int) $conn->query('SELECT COUNT(*) FROM landmarks')->fetchColumn();
+    $totalWaypoints = (int) $conn->query('SELECT COUNT(*) FROM waypoints')->fetchColumn();
 
     $routeStmt = $conn->query('SELECT is_active, COUNT(*) AS cnt FROM routes GROUP BY is_active');
     $activeRoutes = 0;
@@ -106,6 +107,7 @@ try {
             "inactive_routes" => $inactiveRoutes,
             "total_terminals" => $totalTerminals,
             "total_landmarks" => $totalLandmarks,
+            "total_waypoints" => $totalWaypoints,
         ],
         "hubs" => $hubs,
         "map" => [
