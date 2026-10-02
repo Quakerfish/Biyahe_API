@@ -4,7 +4,15 @@
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $filePath = __DIR__ . '/..' . $uri;
 
-// If it's a real file (CSS, JS, images), serve it directly
+// 1. If requesting a specific .php file directly (e.g. /admin_login.php)
+if (str_ends_with($uri, '.php')) {
+    if (file_exists($filePath)) {
+        require $filePath;
+        exit;
+    }
+}
+
+// 2. Serve static assets (CSS, JS, Images) if requested through the router
 if ($uri !== '/' && file_exists($filePath) && !is_dir($filePath)) {
     $mime = mime_content_type($filePath);
     if (str_ends_with($filePath, '.css')) $mime = 'text/css';
@@ -15,16 +23,12 @@ if ($uri !== '/' && file_exists($filePath) && !is_dir($filePath)) {
     exit;
 }
 
-// Route PHP requests
-if (file_exists($filePath) && str_ends_with($filePath, '.php')) {
-    require $filePath;
-    exit;
-}
-
-// Fallback / default route
+// 3. Fallback for root / or missing routes
 if ($uri === '/' || $uri === '') {
-    require __DIR__ . '/../admin/index.html'; // adjust to your actual login/index page
-    exit;
+    if (file_exists(__DIR__ . '/../admin/index.html')) {
+        require __DIR__ . '/../admin/index.html';
+        exit;
+    }
 }
 
 http_response_code(404);
